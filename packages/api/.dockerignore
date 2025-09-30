@@ -1,0 +1,10 @@
+node_modules
+dist
+lib
+*.log
+.DS_Store
+.env
+.vscode
+.idea
+*.md
+!README.md
