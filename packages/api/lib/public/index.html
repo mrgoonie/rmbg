@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMBG API - Background Removal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="file"],
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="file"]:focus,
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result.active {
+            display: block;
+        }
+
+        .result img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .result-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .result-actions .btn {
+            flex: 1;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .method.get {
+            background: #61affe;
+            color: white;
+        }
+
+        .method.post {
+            background: #49cc90;
+            color: white;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .model-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .model-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .model-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .result-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 RMBG API</h1>
+            <p>AI-Powered Background Removal Service</p>
+        </header>
+
+        <!-- API Testing Form -->
+        <div class="card">
+            <h2>🚀 Try It Now</h2>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="imageFile">Select Image</label>
+                    <input type="file" id="imageFile" name="image" accept="image/jpeg,image/png,image/jpg,image/webp" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <select id="model" name="model">
+                        <option value="u2netp">U2Net-P (Fast, 320px)</option>
+                        <option value="modnet" selected>MODNet (Balanced, 512px)</option>
+                        <option value="briaai">BRIA AI (High Quality, 1024px)</option>
+                        <option value="isnet-anime">IS-Net Anime (Anime, 1024px)</option>
+                        <option value="silueta">Silueta (Portrait, 320px)</option>
+                        <option value="u2net-cloth">U2Net Cloth (Clothing, 768px)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxResolution">Max Resolution (px)</label>
+                    <input type="number" id="maxResolution" name="maxResolution" value="2048" min="1" max="4096">
+                </div>
+
+                <button type="submit" class="btn">Remove Background</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your image...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="result" id="result">
+                <h3>✨ Result</h3>
+                <img id="resultImage" alt="Result">
+                <div class="result-actions">
+                    <button class="btn" onclick="downloadResult()">Download Image</button>
+                    <button class="btn" onclick="resetForm()">Process Another</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Documentation -->
+        <div class="card">
+            <h2>📚 API Documentation</h2>
+            
+            <h3>Available Endpoints</h3>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <code>/health</code>
+                <p style="margin-top: 10px;">Health check endpoint to verify API status.</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <code>/models</code>
+                <p style="margin-top: 10px;">List all available background removal models.</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <code>/remove-background</code>
+                <p style="margin-top: 10px;">Remove background from an image.</p>
+            </div>
+
+            <h3>Available Models</h3>
+            <div class="model-grid" id="modelGrid">
+                <div class="model-card">
+                    <h4>u2netp</h4>
+                    <div class="model-info">Resolution: 320px | Size: ~4.5MB</div>
+                    <p style="margin-top: 10px;">Fast and lightweight model for general use.</p>
+                </div>
+                <div class="model-card">
+                    <h4>modnet</h4>
+                    <div class="model-info">Resolution: 512px | Size: ~25MB</div>
+                    <p style="margin-top: 10px;">Balanced quality and performance.</p>
+                </div>
+                <div class="model-card">
+                    <h4>briaai</h4>
+                    <div class="model-info">Resolution: 1024px | Size: ~44MB</div>
+                    <p style="margin-top: 10px;">High-quality results for production use.</p>
+                </div>
+                <div class="model-card">
+                    <h4>isnet-anime</h4>
+                    <div class="model-info">Resolution: 1024px | Size: ~168MB</div>
+                    <p style="margin-top: 10px;">Specialized for anime and manga images.</p>
+                </div>
+                <div class="model-card">
+                    <h4>silueta</h4>
+                    <div class="model-info">Resolution: 320px | Size: ~43MB</div>
+                    <p style="margin-top: 10px;">Optimized for portrait and people photos.</p>
+                </div>
+                <div class="model-card">
+                    <h4>u2net-cloth</h4>
+                    <div class="model-info">Resolution: 768px | Size: ~170MB</div>
+                    <p style="margin-top: 10px;">Specialized for clothing and fashion.</p>
+                </div>
+            </div>
+
+            <h3>Usage Examples</h3>
+
+            <h4>cURL</h4>
+            <pre><code># Basic usage with default model
+curl -X POST http://localhost:3000/remove-background \
+  -F "image=@photo.jpg" \
+  --output result.png
+
+# With specific model
+curl -X POST http://localhost:3000/remove-background \
+  -F "image=@photo.jpg" \
+  -F "model=briaai" \
+  --output result.png
+
+# With custom resolution
+curl -X POST http://localhost:3000/remove-background \
+  -F "image=@photo.jpg" \
+  -F "model=briaai" \
+  -F "maxResolution=4096" \
+  --output result.png</code></pre>
+
+            <h4>JavaScript (Fetch API)</h4>
+            <pre><code>const formData = new FormData();
+formData.append('image', fileInput.files[0]);
+formData.append('model', 'briaai');
+formData.append('maxResolution', '2048');
+
+const response = await fetch('http://localhost:3000/remove-background', {
+  method: 'POST',
+  body: formData
+});
+
+const blob = await response.blob();
+const url = URL.createObjectURL(blob);
+// Use the URL to display or download the image</code></pre>
+
+            <h4>Python</h4>
+            <pre><code>import requests
+
+url = 'http://localhost:3000/remove-background'
+files = {'image': open('photo.jpg', 'rb')}
+data = {'model': 'briaai', 'maxResolution': '2048'}
+
+response = requests.post(url, files=files, data=data)
+
+with open('result.png', 'wb') as f:
+    f.write(response.content)</code></pre>
+
+            <h3>Parameters</h3>
+            <ul style="margin-left: 20px; margin-top: 15px;">
+                <li style="margin-bottom: 10px;"><code>image</code> (required): Image file (JPEG, PNG, WebP) - Max 10MB</li>
+                <li style="margin-bottom: 10px;"><code>model</code> (optional): Model name - Default: "modnet"</li>
+                <li style="margin-bottom: 10px;"><code>maxResolution</code> (optional): Max resolution in pixels (1-4096) - Default: 2048</li>
+            </ul>
+
+            <h3>Response</h3>
+            <p style="margin-top: 15px;">Returns a PNG image with transparent background on success, or JSON error message on failure.</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const error = document.getElementById('error');
+        const resultImage = document.getElementById('resultImage');
+        let resultBlob = null;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Reset states
+            loading.classList.add('active');
+            result.classList.remove('active');
+            error.classList.remove('active');
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/remove-background', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to process image');
+                }
+
+                resultBlob = await response.blob();
+                const url = URL.createObjectURL(resultBlob);
+                resultImage.src = url;
+                
+                loading.classList.remove('active');
+                result.classList.add('active');
+            } catch (err) {
+                loading.classList.remove('active');
+                error.textContent = 'Error: ' + err.message;
+                error.classList.add('active');
+            }
+        });
+
+        function downloadResult() {
+            if (resultBlob) {
+                const url = URL.createObjectURL(resultBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `removed-bg-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function resetForm() {
+            form.reset();
+            result.classList.remove('active');
+            error.classList.remove('active');
+            resultBlob = null;
+        }
+    </script>
+</body>
+</html>
