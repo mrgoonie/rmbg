@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -35,17 +35,18 @@ COPY packages/model-u2net-cloth ./packages/model-u2net-cloth
 RUN pnpm --filter @rmbg/api build
 
 # Production stage
-FROM node:20-alpine
+FROM node:20-slim
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install build dependencies for sharp
-RUN apk add --no-cache \
+# Install build dependencies for sharp and system dependencies
+RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
-    vips-dev
+    libvips-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
