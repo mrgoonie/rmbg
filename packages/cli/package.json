@@ -1,5 +1,5 @@
 {
-  "name": "@rmbg/cli",
+  "name": "rmbg-cli",
   "version": "0.0.1",
   "description": "CLI tool for removing backgrounds from images",
   "main": "lib/index.js",

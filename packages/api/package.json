@@ -1,5 +1,5 @@
 {
-  "name": "@rmbg/api",
+  "name": "rmbg-api",
   "version": "0.0.1",
   "description": "API server for removing backgrounds from images",
   "main": "lib/index.js",

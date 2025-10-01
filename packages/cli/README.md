@@ -1,13 +1,13 @@
-# @rmbg/cli
+# rmbg-cli
 
 CLI tool for removing backgrounds from images using ONNX Runtime and machine learning models.
 
 ## Installation
 
 ```bash
-npm install -g @rmbg/cli
+npm install -g rmbg-cli
 # or
-pnpm add -g @rmbg/cli
+pnpm add -g rmbg-cli
 ```
 
 ## Usage

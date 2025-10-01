@@ -1,4 +1,4 @@
-# @rmbg/api
+# rmbg-api
 
 ## 0.0.1
 

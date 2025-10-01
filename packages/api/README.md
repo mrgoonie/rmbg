@@ -1,4 +1,4 @@
-# @rmbg/api
+# rmbg-api
 
 REST API server for removing backgrounds from images using AI models.
 
@@ -29,13 +29,13 @@ docker run -p 3000:3000 rmbg-api
 pnpm install
 
 # Build the API
-pnpm --filter @rmbg/api build
+pnpm --filter rmbg-api build
 
 # Start the server
-pnpm --filter @rmbg/api start
+pnpm --filter rmbg-api start
 
 # Or run in development mode
-pnpm --filter @rmbg/api dev
+pnpm --filter rmbg-api dev
 ```
 
 ## API Endpoints

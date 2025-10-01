@@ -31,14 +31,14 @@ const model = createU2netpModel()
 const blob = await rmbg(imageFile, { model })
 ```
 
-### CLI (`@rmbg/cli`)
+### CLI (`rmbg-cli`)
 Command-line tool for batch processing images.
 
 **Installation:**
 ```bash
-npm install -g @rmbg/cli
+npm install -g rmbg-cli
 # or
-pnpm install -g @rmbg/cli
+pnpm install -g rmbg-cli
 ```
 
 **Basic Usage:**
@@ -93,7 +93,7 @@ pnpm install
 pnpm tauri build
 ```
 
-### REST API (`@rmbg/api`)
+### REST API (`rmbg-api`)
 HTTP API server for background removal service.
 
 **Quick Start with Docker:**
@@ -110,8 +110,8 @@ curl http://localhost:3000/health
 **Or using Node.js:**
 ```bash
 pnpm install
-pnpm --filter @rmbg/api build
-pnpm --filter @rmbg/api start
+pnpm --filter rmbg-api build
+pnpm --filter rmbg-api start
 ```
 
 **Web Interface:**
@@ -268,10 +268,10 @@ pnpm -r build
 pnpm --filter @rmbg/browser dev
 
 # CLI
-pnpm --filter @rmbg/cli dev input.jpg
+pnpm --filter rmbg-cli dev input.jpg
 
 # API server
-pnpm --filter @rmbg/api dev
+pnpm --filter rmbg-api dev
 
 # Desktop app
 pnpm --filter @rmbg/desktop tauri dev
