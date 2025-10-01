@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "rimraf lib && tsc",
+    "build": "rimraf lib && tsc && cp -r src/public lib/public",
     "start": "node lib/server.js",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0"
   },

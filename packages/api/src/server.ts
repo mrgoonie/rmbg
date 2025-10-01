@@ -1,7 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express'
 import multer from 'multer'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { rmbg, createU2netpModel, createModnetModel, createBriaaiModel, createIsnetAnimeModel, createSiluetaModel, createU2netClothModel } from './core/index.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -25,6 +30,7 @@ const upload = multer({
 // Middleware
 app.use(cors())
 app.use(express.json())
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Model registry
 const models = {
@@ -35,6 +41,11 @@ const models = {
   'silueta': createSiluetaModel(),
   'u2net-cloth': createU2netClothModel()
 }
+
+// Root endpoint - serve HTML page
+app.get('/', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
@@ -68,8 +79,8 @@ app.post('/remove-background', upload.single('image'), async (req: Request, res:
       return
     }
 
-    // Get model name from query or body (default to u2netp)
-    const modelName = (req.query.model as string) || (req.body.model as string) || 'u2netp'
+    // Get model name from query or body (default to modnet)
+    const modelName = (req.query.model as string) || (req.body.model as string) || 'modnet'
     const maxResolution = parseInt((req.query.maxResolution as string) || (req.body.maxResolution as string) || '2048')
 
     // Validate model
