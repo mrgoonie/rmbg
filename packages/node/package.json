@@ -1,6 +1,6 @@
 {
   "name": "rmbg",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Remove image backgrounds in Node.js using AI models",
   "keywords": [
     "background-removal",
