@@ -205,3 +205,37 @@ This repo uses **@changesets/cli** for version management:
 - Commit the `.changeset/*.md` file
 
 The `@rmbg/website` package is ignored in changeset config.
+
+---
+
+## Development Rules
+
+### General
+- Use `bun` instead of `npm` or `yarn` or `pnpm` for package management
+- Use `context7` mcp tools for exploring latest docs of plugins/packages
+- Use `eyes` mcp tools for describing details of images, videos, documents, etc.
+- Use `hands` mcp tools for generating images, videos, documents, etc.
+- Use `brain` mcp tools for sequential thinking, analyzing code, debugging, etc.
+- Follow [these principles](https://www.anthropic.com/engineering/writing-tools-for-agents) to write effective tools for AI agents.
+
+### Code Quality Guidelines
+- Read and follow strictly codebase structure and code standards in `./docs`
+- Don't be too harsh on code linting, but make sure there are no syntax errors and code are compilable
+- Prioritize functionality and readability over strict style enforcement and code formatting
+- Use reasonable code quality standards that enhance developer productivity
+- Use try catch error handling & cover security standards
+- Use `code-reviewer` agent to review code after every implementation
+- Always use `debugger` agent to analyze `./logs.txt` to find possible root causes and provide a report with solutions.
+- Use `bun run typecheck` to check type errors and fix them all.
+- Make sure the code is compilable and runs successfully without any errors.
+
+### Pre-commit/Push Rules
+- Run linting before commit
+- Run tests before push (DO NOT ignore failed tests just to pass the build or github actions)
+- Keep commits focused on the actual code changes
+- **DO NOT** commit and push any confidential information (such as dotenv files, API keys, database credentials, etc.) to git repository!
+- NEVER automatically add AI attribution signatures like:
+  "🤖 Generated with [Claude Code]"
+  "Co-Authored-By: Claude noreply@anthropic.com"
+  Any AI tool attribution or signature
+- Create clean, professional commit messages without AI references. Use conventional commit format.
