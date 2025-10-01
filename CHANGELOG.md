@@ -1,3 +1,15 @@
+## [1.0.2](https://github.com/mrgoonie/rmbg/compare/v1.0.1...v1.0.2) (2025-10-01)
+
+
+### 🐛 Bug Fixes
+
+* **ci:** configure changesets workflow for npm publishing ([f24fe49](https://github.com/mrgoonie/rmbg/commit/f24fe49c0adf8b8046598d19165869244fdf836d))
+
+
+### 📚 Documentation
+
+* add development guidelines and Claude AI configuration ([4d8a567](https://github.com/mrgoonie/rmbg/commit/4d8a567c5253eacda277679b01e98a346c7ae139))
+
 ## [1.0.1](https://github.com/mrgoonie/rmbg/compare/v1.0.0...v1.0.1) (2025-10-01)
 
 
