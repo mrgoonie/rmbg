@@ -144,13 +144,14 @@ const config: Config = {
         }
       }
     },
-    [
+    // Only include Google Analytics if GA_ID is defined
+    ...(process.env.GA_ID ? [[
       '@docusaurus/plugin-google-gtag',
       {
         trackingID: process.env.GA_ID,
         anonymizeIP: true
       }
-    ]
+    ]] : [])
   ]
 }
 
