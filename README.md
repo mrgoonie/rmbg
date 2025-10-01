@@ -34,11 +34,54 @@ const blob = await rmbg(imageFile, { model })
 ### CLI (`@rmbg/cli`)
 Command-line tool for batch processing images.
 
+**Installation:**
 ```bash
 npm install -g @rmbg/cli
+# or
+pnpm install -g @rmbg/cli
+```
 
-# Remove background from image
-rmbg input.jpg -o output.png -m u2netp
+**Basic Usage:**
+```bash
+# Remove background from image (uses modnet by default)
+rmbg input.jpg -o output.png
+
+# Specify a model
+rmbg input.jpg -o output.png -m briaai
+
+# Set max resolution
+rmbg input.jpg -o output.png -r 4096
+```
+
+**CLI Options:**
+```bash
+Usage: rmbg [options] <input>
+
+Arguments:
+  input                    Input image path
+
+Options:
+  -o, --output <path>      Output image path (default: input-no-bg.png)
+  -m, --model <model>      Model to use: briaai, modnet, u2netp (default: modnet)
+  -r, --max-resolution <n> Maximum output resolution (default: 2048)
+  -h, --help               Display help
+  -V, --version            Display version
+```
+
+**Examples:**
+```bash
+# Basic usage
+rmbg photo.jpg
+# Output: photo-no-bg.png
+
+# High quality with briaai model
+rmbg portrait.jpg -m briaai -o portrait-clean.png
+
+# Fast processing with u2netp
+rmbg product.png -m u2netp -o product-nobg.png
+
+# 4K output
+rmbg image.jpg -r 4096 -o image-4k.png
 ```
 
 ### Desktop App (`@rmbg/desktop`)
@@ -53,38 +96,137 @@ pnpm tauri build
 ### REST API (`@rmbg/api`)
 HTTP API server for background removal service.
 
+**Quick Start with Docker:**
 ```bash
-# Using Docker
-docker-compose up -d
+# Clone and run
+git clone <repository-url>
+cd rmbg
+docker compose up -d
 
-# Using Node.js
+# Test it
+curl http://localhost:3000/health
+```
+
+**Or using Node.js:**
+```bash
+pnpm install
 pnpm --filter @rmbg/api build
 pnpm --filter @rmbg/api start
 ```
 
-**API Endpoints:**
-- `GET /health` - Health check
-- `GET /models` - List available models
-- `POST /remove-background` - Remove background from uploaded image
+**Web Interface:**
 
-Example:
+Open http://localhost:3000 in your browser for an interactive web UI with:
+- 🎨 Live image upload and processing
+- 📊 Model selection (6 AI models available)
+- 📖 Complete API documentation
+- ⬇️ Direct download of processed images
+
+**API Endpoints:**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Web UI interface |
+| GET | `/health` | Health check |
+| GET | `/models` | List available models |
+| POST | `/remove-background` | Remove background |
+
+**API Usage Examples:**
+
+**Basic cURL:**
 ```bash
+# Default model (modnet)
 curl -X POST http://localhost:3000/remove-background \
   -F "image=@input.jpg" \
-  -F "model=u2netp" \
   --output output.png
+
+# Specific model
+curl -X POST http://localhost:3000/remove-background \
+  -F "image=@input.jpg" \
+  -F "model=briaai" \
+  --output output.png
+
+# Custom resolution
+curl -X POST http://localhost:3000/remove-background \
+  -F "image=@input.jpg" \
+  -F "model=briaai" \
+  -F "maxResolution=4096" \
+  --output output.png
+```
+
+**JavaScript/TypeScript:**
+```javascript
+const formData = new FormData();
+formData.append('image', fileInput.files[0]);
+formData.append('model', 'modnet');
+formData.append('maxResolution', '2048');
+
+const response = await fetch('http://localhost:3000/remove-background', {
+  method: 'POST',
+  body: formData
+});
+
+const blob = await response.blob();
+const url = URL.createObjectURL(blob);
+```
+
+**Python:**
+```python
+import requests
+
+url = 'http://localhost:3000/remove-background'
+files = {'image': open('photo.jpg', 'rb')}
+data = {'model': 'modnet', 'maxResolution': '2048'}
+
+response = requests.post(url, files=files, data=data)
+
+with open('result.png', 'wb') as f:
+    f.write(response.content)
+```
+
+**Request Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `image` | File | Yes | - | Image file (JPEG, PNG, WebP, max 10MB) |
+| `model` | String | No | `modnet` | Model name (see available models below) |
+| `maxResolution` | Number | No | `2048` | Max output resolution (1-4096) |
+
+**Response:**
+- **Success**: PNG image with transparent background (Content-Type: `image/png`)
+- **Error**: JSON with error details
+
+**Error Responses:**
+```json
+// Missing image
+{
+  "error": "No image file provided",
+  "message": "Please upload an image file using the 'image' field"
+}
+
+// Invalid model
+{
+  "error": "Invalid model",
+  "message": "Model 'xyz' not found. Available models: u2netp, modnet, briaai, isnet-anime, silueta, u2net-cloth"
+}
+
+// File too large
+{
+  "error": "File too large",
+  "message": "Maximum file size is 10MB"
+}
 ```
 
 ## Available Models
 
 | Model | Resolution | Size | Description |
 |-------|------------|------|-------------|
-| u2netp | 320px | 4.5MB | Fastest, default model |
-| modnet | 512px | 25MB | Medium quality |
+| **modnet** | 512px | 25MB | **Default** - Best balance of quality/speed |
+| u2netp | 320px | 4.5MB | Fastest, lightweight |
 | briaai | 1024px | 44MB | Highest quality |
-| isnet-anime | 1024px | 168MB | Optimized for anime |
-| silueta | 320px | 43MB | Specialized model |
-| u2net-cloth | 768px | 170MB | Clothing-focused |
+| isnet-anime | 1024px | 168MB | Optimized for anime/manga |
+| silueta | 320px | 43MB | Portrait-focused |
+| u2net-cloth | 768px | 170MB | Clothing/fashion-focused |
 
 ## Quick Start
 
