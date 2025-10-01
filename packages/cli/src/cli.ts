@@ -29,7 +29,7 @@ program
   .option(
     '-m, --model <model>',
     'Model to use (briaai, modnet, u2netp)',
-    'u2netp'
+    'modnet'
   )
   .option(
     '-r, --max-resolution <number>',

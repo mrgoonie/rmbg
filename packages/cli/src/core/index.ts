@@ -28,35 +28,38 @@ export async function rmbg(
 
     progress += 1 / 2
 
-    // Process image
+    // Process image - EXACTLY like browser implementation
+    // Step 1: Get original image data
     const imageBuffer = await sharp(inputPath).raw().ensureAlpha().toBuffer({
       resolveWithObject: true
     })
 
-    const { data, info } = imageBuffer
-    const { width, height } = info
+    const { data: originalData, info } = imageBuffer
+    const { width: originalWidth, height: originalHeight } = info
 
-    // Resize to model resolution
-    const resizedImage = await sharp(data, {
-      raw: { width, height, channels: 4 }
+    // Step 2: Resize image to model resolution for inference (like browser's imageDataResize)
+    const tensorImageBuffer = await sharp(originalData, {
+      raw: { width: originalWidth, height: originalHeight, channels: 4 }
     })
       .resize(model.resolution, model.resolution, {
-        fit: 'fill',
+        fit: 'fill',  // Browser uses fill to match exact model input size
         kernel: 'lanczos3'
       })
       .raw()
-      .toBuffer()
+      .toBuffer({ resolveWithObject: true })
 
-    // Convert to Float32Array
-    const tensorImageData = imageDataToFloat32Array(
-      new Uint8ClampedArray(resizedImage),
+    const tensorImageData = new Uint8ClampedArray(tensorImageBuffer.data)
+
+    // Step 3: Convert to Float32Array for model input
+    const inputTensor = imageDataToFloat32Array(
+      tensorImageData,
       model.resolution,
       model.resolution
     )
 
-    // Run inference
+    // Step 4: Run inference
     const outputData = await session.run({
-      [session.inputNames[0]]: new ort.Tensor('float32', tensorImageData, [
+      [session.inputNames[0]]: new ort.Tensor('float32', inputTensor, [
         1,
         3,
         model.resolution,
@@ -69,35 +72,35 @@ export async function rmbg(
       // ignore
     })
 
-    // Get alpha mask
+    // Step 5: Get alpha mask from model output
     const output: ort.Tensor = outputData[outputNames[0]]
     const maskData = output.data as Float32Array
 
-    // Resize mask back to original size
-    const maskBuffer = Buffer.from(
-      maskData.map((v) => Math.round(v * 255))
-    )
+    // Step 6: Apply mask to tensorImage (like browser lines 149-154)
+    const stride = model.resolution * model.resolution
+    for (let i = 0; i < stride; i++) {
+      const alpha = maskData[i]
+      tensorImageData[i * 4 + 3] = Math.round(alpha * 255)
+    }
 
-    const resizedMask = await sharp(maskBuffer, {
-      raw: {
-        width: model.resolution,
-        height: model.resolution,
-        channels: 1
-      }
+    // Step 7: Resize tensorImage back to original dimensions (like browser lines 155-159)
+    const resizedTensorImage = await sharp(Buffer.from(tensorImageData), {
+      raw: { width: model.resolution, height: model.resolution, channels: 4 }
     })
-      .resize(width, height, {
+      .resize(originalWidth, originalHeight, {
         fit: 'fill',
         kernel: 'lanczos3'
       })
       .raw()
       .toBuffer()
 
-    // Apply mask to original image
-    const outputBuffer = Buffer.from(data)
-    for (let i = 0; i < width * height; i++) {
-      const alpha = resizedMask[i]
+    // Step 8: Apply resized mask to original image (like browser lines 160-168)
+    const outputBuffer = Buffer.from(originalData)
+    for (let i = 0; i < originalWidth * originalHeight; i++) {
+      const alpha = resizedTensorImage[i * 4 + 3]
       outputBuffer[i * 4 + 3] = alpha
-
+      
+      // Zero out RGB if alpha is 0 (like browser)
       if (alpha === 0) {
         outputBuffer[i * 4] = 0
         outputBuffer[i * 4 + 1] = 0
@@ -105,21 +108,23 @@ export async function rmbg(
       }
     }
 
-    // Apply max resolution limit
+    // Apply max resolution limit (like browser lines 169-177)
     const [finalWidth, finalHeight] = calculateProportionalSize(
-      width,
-      height,
+      originalWidth,
+      originalHeight,
       maxResolution,
       maxResolution
     )
 
     // Convert to PNG
     let result = sharp(outputBuffer, {
-      raw: { width, height, channels: 4 }
+      raw: { width: originalWidth, height: originalHeight, channels: 4 }
     })
 
-    if (finalWidth !== width || finalHeight !== height) {
-      result = result.resize(finalWidth, finalHeight)
+    if (finalWidth !== originalWidth || finalHeight !== originalHeight) {
+      result = result.resize(finalWidth, finalHeight, {
+        kernel: 'lanczos3'
+      })
     }
 
     onProgress?.(1, 1, 1)
