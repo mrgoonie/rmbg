@@ -17,6 +17,16 @@ This is a **pnpm monorepo** with the following packages:
   - Runtime: isolated worker via `src/runtime.ts` (handles postMessage communication)
   - Core logic: `src/core/index.ts` (ONNX inference, image processing)
 
+- **`packages/node/`** - Node.js SDK using onnxruntime-node
+  - Entry: `src/index.ts` (main API with `rmbg()` function)
+  - Core: `src/core/index.ts` (ONNX inference, uses Sharp for image processing)
+  - Models: `src/models.ts` (model factory functions)
+  - Security: `src/core/security.ts` (SSRF prevention, path traversal protection)
+  - Input support: file paths, URLs, Buffers, streams
+  - Output support: Buffer, file path, writable stream
+  - Full TypeScript support with ESM and CommonJS builds
+  - 28 tests covering all functionality
+
 - **`packages/cli/`** - Node.js CLI tool using onnxruntime-node
   - Entry: `src/cli.ts` (commander-based CLI)
   - Core: `src/core/index.ts` (uses Sharp for image processing)
@@ -49,13 +59,21 @@ This is a **pnpm monorepo** with the following packages:
    - Apply mask to original image (set alpha channel)
 5. **Output**: PNG with transparency
 
-### Browser vs Node Implementation
+### Platform Implementations
 
 - **Browser** (`packages/browser/`):
   - Uses `createImageBitmap` and Canvas API for image manipulation
   - Downloads models via `fetch()` with progress tracking
   - Runs in iframe for isolation (prevents blocking main thread)
   - Uses `onnxruntime-web` with WASM backend
+
+- **Node.js SDK** (`packages/node/`):
+  - Uses `sharp` library for high-performance image processing
+  - Downloads models via `https.get()` with progress tracking
+  - Uses `onnxruntime-node` with native CPU execution
+  - Model caching in temp directory (configurable)
+  - Programmatic API with multiple input/output formats
+  - Security hardening (SSRF prevention, path traversal protection)
 
 - **CLI** (`packages/cli/`):
   - Uses `sharp` library for high-performance image processing
@@ -104,6 +122,28 @@ Exports:
 - `./models`: model factory functions
 - `./runtime`: isolated runtime (for iframe)
 
+### Node.js SDK
+
+```bash
+cd packages/node
+pnpm dev                  # Run tests in watch mode
+pnpm build                # Build ESM and CommonJS (lib/)
+pnpm test                 # Run all tests (28 tests)
+pnpm typecheck            # Type check TypeScript
+```
+
+Exports:
+- Default: `rmbg()` function
+- `./models`: model factory functions (createU2netpModel, createModnetModel, createBriaaiModel)
+
+Usage:
+```typescript
+import { rmbg } from 'rmbg'
+import { createBriaaiModel } from 'rmbg/models'
+
+const output = await rmbg('input.jpg', { model: createBriaaiModel() })
+```
+
 ### CLI
 
 ```bash
@@ -145,6 +185,13 @@ pnpm serve                # Preview production build
 - `imageDataToFloat32Array()` - Converts RGBA to planar RGB float32 (CHW format)
 - `imageDataToBlob()` - Converts back to PNG/JPEG blob
 
+**Node.js SDK** (`packages/node/src/core/utils.ts`):
+- Uses Sharp for all image operations
+- `imageDataToFloat32Array()` - Converts Uint8ClampedArray to planar float32
+- `loadImageFromSource()` - Handles file paths, URLs, Buffers, streams
+- `saveImageToDestination()` - Saves to file path or writable stream
+- Security validation for URLs and file paths
+
 **CLI** (`packages/cli/src/core/utils.ts`):
 - Uses Sharp for all image operations
 - `imageDataToFloat32Array()` - Converts Uint8ClampedArray to planar float32
@@ -169,7 +216,7 @@ pnpm serve                # Preview production build
 }
 ```
 
-**CLI**:
+**Node.js SDK & CLI**:
 ```javascript
 {
   executionProviders: ['cpu'],
@@ -183,7 +230,10 @@ pnpm serve                # Preview production build
 1. Create `packages/model-<name>/` directory
 2. Add ONNX files (split large models into chunks)
 3. Add package.json with version
-4. Add model factory to `packages/browser/src/models.ts` and `packages/cli/src/core/models.ts`
+4. Add model factory to:
+   - `packages/browser/src/models.ts` (for browser SDK)
+   - `packages/node/src/models.ts` (for Node.js SDK)
+   - `packages/cli/src/core/models.ts` (for CLI)
 5. Publish model package to npm
 
 ## Testing

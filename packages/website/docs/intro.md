@@ -14,7 +14,15 @@ sidebar_position: 1
   }}
 />
 
-RMBG is a image background removal application that runs on multiple platforms and incorporates a variety of open-source AI models. Designed with a strong emphasis on user privacy, RMBG does not upload your files to any servers, ensuring that your data remains secure and private.
+RMBG is an image background removal application that runs on multiple platforms and incorporates a variety of open-source AI models. Designed with a strong emphasis on user privacy, RMBG does not upload your files to any servers, ensuring that your data remains secure and private.
+
+## Available Platforms
+
+- **Browser SDK** - Client-side background removal in the browser
+- **Node.js SDK** - Server-side background removal for Node.js applications
+- **CLI** - Command-line tool for batch processing
+- **Desktop App** - Standalone desktop application (Tauri)
+- **REST API** - HTTP API server for web services
 
 ## AI-Powered Background Removal
 

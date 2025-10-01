@@ -8,13 +8,45 @@ RMBG is a image background removal application that runs on multiple platforms a
 
 ## Features
 
-- 🎨 **Multiple Platforms**: Browser SDK, CLI, Desktop (Tauri), and REST API
+- 🎨 **Multiple Platforms**: Browser SDK, Node.js SDK, CLI, Desktop (Tauri), and REST API
 - 🤖 **Multiple AI Models**: Support for 6+ ONNX models with different quality/speed tradeoffs
-- 🔒 **Privacy-First**: All processing happens locally (browser/CLI) or server-side (API) - no third-party uploads
+- 🔒 **Privacy-First**: All processing happens locally (browser/CLI/Node.js) or server-side (API) - no third-party uploads
 - ⚡ **High Performance**: Optimized with ONNX Runtime (Web/Node)
 - 🎯 **Easy to Use**: Simple APIs for all platforms
 
 ## Available Packages
+
+### Node.js SDK (`rmbg`)
+Server-side background removal for Node.js applications with a simple API.
+
+```bash
+npm install rmbg
+```
+
+```javascript
+import { rmbg } from 'rmbg'
+
+// Simple usage - returns PNG buffer
+const output = await rmbg('input.jpg')
+
+// Save to file
+await rmbg('input.jpg', { output: 'output.png' })
+
+// Use different models
+import { createBriaaiModel } from 'rmbg/models'
+const output = await rmbg('input.jpg', { model: createBriaaiModel() })
+```
+
+**Features:**
+- Multiple input formats: file paths, URLs, Buffers, streams
+- Multiple output formats: Buffer, file path, writable stream
+- 3 AI models: u2netp (fast), modnet (balanced), briaai (high quality)
+- Model caching for performance
+- Progress tracking and cancellation support
+- Full TypeScript support with ESM and CommonJS
+- Framework integration: Express, Next.js, AWS Lambda, etc.
+
+[📖 Full Node.js SDK Documentation](packages/node/README.md)
 
 ### Browser SDK (`@rmbg/browser`)
 Client-side background removal using WebAssembly and ONNX Runtime Web.
@@ -288,6 +320,7 @@ rmbg/
 │   ├── browser/       # Browser SDK (ONNX Runtime Web)
 │   ├── cli/           # Command-line tool (Node.js + Sharp)
 │   ├── desktop/       # Desktop app (Tauri + React)
+│   ├── node/          # Node.js SDK (ONNX Runtime Node)
 │   ├── website/       # Documentation (Docusaurus)
 │   └── model-*/       # ONNX model packages
 ├── docker-compose.yml # Docker Compose for API server

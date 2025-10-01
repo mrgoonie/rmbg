@@ -2,6 +2,8 @@
 
 REST API server for removing backgrounds from images using AI models.
 
+> **💡 Note:** If you're building a Node.js application and need programmatic access, consider using the [Node.js SDK (`rmbg`)](../node/README.md) instead. It provides a simpler API without the need for HTTP requests.
+
 ## Features
 
 - 🚀 Fast background removal using ONNX Runtime
