@@ -4,6 +4,9 @@
   "description": "API server for removing backgrounds from images",
   "main": "lib/index.js",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "rimraf lib && tsc && cp -r src/public lib/public",
