@@ -4,6 +4,11 @@
   "description": "API server for removing backgrounds from images",
   "main": "lib/index.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrgoonie/rmbg.git",
+    "directory": "packages/api"
+  },
   "publishConfig": {
     "access": "public"
   },
