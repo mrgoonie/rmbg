@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/mrgoonie/rmbg/compare/v1.0.0...v1.0.1) (2025-10-01)
+
+
+### 🐛 Bug Fixes
+
+* **release:** disable npm publish for root monorepo package ([f46c661](https://github.com/mrgoonie/rmbg/commit/f46c661023d9d7a2d54dfcb31be5fa9886472e40))
+
 ## 1.0.0 (2025-10-01)
 
 
