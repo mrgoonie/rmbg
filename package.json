@@ -2,6 +2,14 @@
   "name": "rmbg",
   "version": "1.0.0",
   "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "scripts": {
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm -r build && changeset publish"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@semantic-release/changelog": "^6.0.3",
