@@ -1,7 +1,7 @@
 # @rmbg/api
 
-## 0.0.2
+## 0.0.1
 
 ### Patch Changes
 
-- f24fe49: Initial npm release for API and CLI packages
+- f24fe49: Initial npm release for API package
