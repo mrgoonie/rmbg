@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.0
+
+### Minor Changes
+
+- b4e26ef: Initial release of RMBG Node.js SDK
+
+  - Simple API for background removal: `await rmbg('image.jpg')`
+  - Multiple input formats: file paths, URLs, Buffers, and streams
+  - Multiple output formats: Buffer, file path, or writable stream
+  - Support for 3 AI models (u2netp, modnet, briaai)
+  - Model caching for improved performance
+  - Progress tracking and operation cancellation
+  - Comprehensive security hardening (path traversal prevention, SSRF protection)
+  - Full TypeScript support with ESM and CommonJS builds
+  - 29 tests with 100% pass rate
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -10,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1] - 2025-10-01
 
 ### Added
+
 - Initial release of RMBG Node.js SDK
 - Simple API: `await rmbg('image.jpg')` for background removal
 - Multiple input formats support: file paths, URLs, Buffers, and streams
@@ -26,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full ESM and CommonJS support
 
 ### Security
+
 - Path traversal prevention for file operations
 - SSRF attack prevention for URL downloads
 - Blocked access to localhost, private IPs, and cloud metadata endpoints
@@ -36,12 +54,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redirect limit (max 3 redirects)
 
 ### Documentation
+
 - Comprehensive README with usage examples
 - Framework integration examples (Express.js, Next.js, AWS Lambda)
 - API reference documentation
 - Security best practices
 
 ### Testing
+
 - 29 tests covering:
   - Unit tests for input/output handlers
   - Security tests for path traversal and SSRF
