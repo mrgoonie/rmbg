@@ -100,6 +100,9 @@ Options:
   -V, --version            Display version
 ```
 
+**Demo**
+![Demo CLI](./demo-cli.jpeg)
+
 **Examples:**
 ```bash
 # Basic usage
